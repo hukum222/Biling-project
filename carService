@@ -1,0 +1,71 @@
+import java.io.*;
+import java.util.*;
+public class Main {
+    public static void main(String[] args)
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Car Name ");
+        String carType = scanner.nextLine();
+        System.out.println("Service Code ");
+        String serviceCodes = scanner.nextLine();
+        String[] services = serviceCodes.split(",");
+        Car car = new Car(carType);
+        for (String serviceCode : services) {
+            car.addService(serviceCode);
+        }
+        car.printBill();
+    }
+}
+class Service {
+    private static Map<String, Service> serviceMap = new HashMap<String, Service>();
+    static {
+        serviceMap.put("BS01", new Service("BS01", 2000, 4000, 5000));
+        serviceMap.put("EF01", new Service("EF01", 5000, 8000, 10000));
+        serviceMap.put("CF01", new Service("CF01", 2000, 4000, 6000));
+        serviceMap.put("BF01", new Service("BF01", 1000, 1500, 2500));
+        serviceMap.put("GF01", new Service("GF01", 3000, 6000, 8000));
+    }
+    private String code;
+    private Map<String, Integer> charges;
+    private Service(String code, int hatchback, int sedan, int suv) {
+        this.code = code;
+        this.charges = new HashMap<String, Integer>();
+        this.charges.put("Hatchback", hatchback);
+        this.charges.put("Sedan", sedan);
+        this.charges.put("SUV", suv);
+}
+public static Service getService(String code) {
+        return serviceMap.get(code);
+    }
+    public int getCharge(String carType) {
+        return charges.get(carType);
+    }
+}
+class Car {
+    private String type;
+    private Map<String, Service> services;
+    private int totalBill;
+    public Car(String type) {
+        this.type = type;
+        this.services = new HashMap<String, Service>();
+        this.totalBill = 0;
+    }
+    public void addService(String code) {
+        Service service = Service.getService(code);
+        if (service != null) {
+            this.services.put(code, service);
+            this.totalBill += service.getCharge(this.type);
+        }
+    }
+    public void printBill() {
+        System.out.println("Type of Car: " + this.type);
+        for (Map.Entry<String, Service> entry : services.entrySet()) {
+            int charge = entry.getValue().getCharge(this.type);
+            System.out.println("Service Code: " + entry.getKey() + ", Charge: " + charge);
+        }
+        System.out.println("Total Bill: " + this.totalBill);
+        if (this.totalBill > 10000) {
+            System.out.println("Complimentary cleaning provided.");
+        }
+    }
+}
